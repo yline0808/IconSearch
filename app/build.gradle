@@ -3,6 +3,10 @@ plugins {
     id 'kotlin-android'
 }
 
+// local.properties 사용을 위함
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     buildFeatures{
         viewBinding true
@@ -18,6 +22,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // url 변수 지정
+        buildConfigField "String", "URL_IMG_SITE", properties['url.pixabay']
     }
 
     buildTypes {
