@@ -24,7 +24,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // url 변수 지정
-        buildConfigField "String", "URL_IMG_SITE", properties['url.pixabay']
+        buildConfigField "String", "URL_ICON_SITE", properties['url.flaticon']
     }
 
     buildTypes {
