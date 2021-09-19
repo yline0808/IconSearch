@@ -41,12 +41,12 @@ class MainActivity : AppCompatActivity() {
         // 메인 코루틴 스코프
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("coroutine Dispatchers.Main start", "test")
-            getImageInformation(iconList, searchText, 1)
+            val isEnd = getIconInformation(iconList, searchText, 1)
             Log.d("coroutine Dispatchers.Main end", "test")
             Toast.makeText(applicationContext, iconList.size.toString(), Toast.LENGTH_SHORT).show()
 
             // 크롤링한 정보 표시
-            binding.textviewTest.text = iconList.toString()
+            binding.textviewTest.text = if(isEnd) "검색한 항목이 없습니다." else iconList.toString()
         }
     }
 
@@ -55,7 +55,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("coroutine activity start", "test")
             // 이미지를 가져오고 textview에표시
             if(query == null){
-                Toast.makeText(applicationContext, "검색한 단어가 없습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    "검색한 단어가 없습니다.",
+                    Toast.LENGTH_SHORT).show()
                 return false
             }else{
                 // 임시로 크롤링한 데이터 매번 지우기
@@ -76,13 +79,14 @@ class MainActivity : AppCompatActivity() {
 }
 
 // 이미지 크롤링 하는 함수
-suspend fun getImageInformation(iconList:HashMap<String, IconInformation>, searchText:String, page:Int):Boolean = withContext(Dispatchers.IO){
+suspend fun getIconInformation(
+    iconList:HashMap<String, IconInformation>, searchText:String, page:Int
+):Boolean = withContext(Dispatchers.IO){
     Log.d("coroutine Dispatchers.IO start", "test")
     // 페이지 끝 여부
     var isEnd = false
 
     try {
-        // https://www.flaticon.com/search/%d?word=%s&license=selection&style=all&order_by=4&type=icon
         // 주어진 검색어와 페이지를 검색
         val jsoup = Jsoup.connect(String.format(BuildConfig.URL_ICON_SITE, page, searchText))
         val doc:Document = jsoup.get()
@@ -109,16 +113,15 @@ suspend fun getImageInformation(iconList:HashMap<String, IconInformation>, searc
     // status오류
     catch (httpStatusException : HttpStatusException){
         isEnd = true
-        Log.e("getImageInformation", httpStatusException.message.toString())
+        Log.e("getIconInformation", httpStatusException.message.toString())
         httpStatusException.printStackTrace()
     }
     // 기타 오류
     catch (exception:Exception){
         isEnd = true
-        Log.e("getImageInformation", exception.message.toString())
+        Log.e("getIconInformation", exception.message.toString())
         exception.printStackTrace()
     }
-
     Log.d("coroutine Dispatchers.IO end", "test")
     isEnd
 }
